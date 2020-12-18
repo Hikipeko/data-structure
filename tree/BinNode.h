@@ -36,19 +36,19 @@ struct BinNode {
     BinNode() :
             parent(nullptr), lc(nullptr), rc(nullptr), height(0), npl(1), color(RB_RED) {}
 
-    BinNode(T e, NodePos p = nullptr, NodePos lc = nullptr, NodePos rc = nullptr,
+    explicit BinNode(T e, NodePos p = nullptr, NodePos lc = nullptr, NodePos rc = nullptr,
             int h = 0, int l = 1, RBColor c = RB_RED) :
             data(e), parent(p), lc(lc), rc(rc), height(h), npl(l), color(c) {}
 
     //操作接口
     int size();//统计当前节点的后代数
     NodePos insertAsLC(T const &e) //作为当前节点的左孩子插入
-    { return lc = newBinNode(e, this); };
+    { return lc = new BinNode(e, this); };
 
     NodePos insertAsRC(T const &e)//作为当前节点的右孩子插入
-    { return rc = newBinNode(e, this); }
+    { return rc = new BinNode(e, this); }
 
-    NodePos succ();//作为当前节点的直接后继
+    //NodePos succ();//作为当前节点的直接后继
     template<typename VST>
     void travLevel(NodePos x, VST &);//子树层次遍历
     template<typename VST>

@@ -55,7 +55,7 @@ template<typename T>
 void BinTree<T>::updateHeightAbove(BinNode<T> *x) {
     while (x) {
         int curr_height = x->height;
-        if( curr_height == updateHeight(x))
+        if (curr_height == updateHeight(x))
             return;
         x = x->parent;
     }
@@ -71,7 +71,7 @@ template<typename T>
 NodePos BinTree<T>::insertAsLC(BinNode<T> *x, const T &e) {
     _size++;
     x->insertAsLC(e);
-    updateHeightAbove();
+    updateHeightAbove(x);
     return x->lc;
 }
 
@@ -79,13 +79,14 @@ template<typename T>
 NodePos BinTree<T>::insertAsRC(BinNode<T> *x, const T &e) {
     _size++;
     x->insertAsRC(e);
-    updateHeightAbove();
+    updateHeightAbove(x);
     return x->rc;
 }
 
 template<typename T>
 NodePos BinTree<T>::attachAsLC(BinNode<T> *x, BinTree<T> *&S) {
-    if (x->lc = S->root)x->lc->parent = x;
+    x->lc = S->root;
+    if (x->lc)x->lc->parent = x;
     _size += S->_size;
     updateHeightAbove(x);
     S->_root = nullptr;
@@ -97,7 +98,8 @@ NodePos BinTree<T>::attachAsLC(BinNode<T> *x, BinTree<T> *&S) {
 
 template<typename T>
 NodePos BinTree<T>::attachAsRC(BinNode<T> *x, BinTree<T> *&S) {
-    if (x->rc = S->root)x->rc->parent = x;
+    x->rc = S->root;
+    if (x->rc)x->rc->parent = x;
     _size += S->_size;
     updateHeightAbove(x);
     S->_root = nullptr;
@@ -117,23 +119,23 @@ int BinTree<T>::remove(BinNode<T> *x) {
 }
 
 template<typename T>
-static int removeAt(NodePos x){
-    if(!x) return 0;
+static int removeAt(NodePos x) {
+    if (!x) return 0;
     int n = 1 + removeAt(x->lc) + removeAt(x->rc);
     release(x->data);
     release(x);
     return n;
 }
 
-template <typename T>
-BinTree<T>* BinTree<T>::secede(NodePos x){
+template<typename T>
+BinTree<T> *BinTree<T>::secede(NodePos x) {
     FromParentTo(*x) = nullptr;
     updateHeightAbove(x->parent);
-    BinTree<T>* S = new BinTree<T>;
+    auto *S = new BinTree<T>;
     S->root = x;
     x->parent = nullptr;
     S->_size = x->_size;
-    _size-= S->_size;
+    _size -= S->_size;
     return S;
 }
 
@@ -166,15 +168,26 @@ void BinNode<T>::travIn_R(NodePos x, VST &visit) {
 
 template<typename T>
 template<typename VST>
-void BinNode<T>::travLevel(VST &visit) {
+void BinNode<T>::travLevel(BinNode<T> *_x, VST &) {
     Queue<NodePos> Q;
-    Q.enqueue(this);
+    Q.enqueue(_x);
     while (!Q.empty()) {
         NodePos x = Q.dequeue();
         visit(x->data);
         if (x->lc) Q.enqueue(x->lc);
         if (x->rc) Q.enqueue((x->rc));
     }
+}
+
+template<typename T>
+int num_decendant(NodePos x) {
+    if (x == nullptr) return 0;
+    else return (x->lc->size() + x->rc->size());
+}
+
+template<typename T>
+int BinNode<T>::size() {
+    return num_decendant(this) - 1;
 }
 
 
