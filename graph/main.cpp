@@ -1,4 +1,7 @@
-//
-// Created by user on 2020/12/19.
-//
+#include <iostream>
+using namespace std;
 
+int main(){
+    cout<<"Hello world!\n";
+    return 0;
+}
